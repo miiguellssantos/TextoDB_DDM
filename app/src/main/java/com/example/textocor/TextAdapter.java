@@ -10,14 +10,14 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class TextoAdapter extends ArrayAdapter<Texto> {
+public class TextAdapter extends ArrayAdapter<Text> {
     private Context context;
-    private ArrayList<Texto> textos;
+    private ArrayList<Text> texts;
 
-    public TextoAdapter(Context context, ArrayList<Texto> textos) {
-        super(context, R.layout.item_texto, textos);
+    public TextAdapter(Context context, ArrayList<Text> texts) {
+        super(context, R.layout.item_texto, texts);
         this.context = context;
-        this.textos = textos;
+        this.texts = texts;
     }
 
     @Override
@@ -25,8 +25,8 @@ public class TextoAdapter extends ArrayAdapter<Texto> {
         LayoutInflater li = LayoutInflater.from(parent.getContext());
         View itemView = li.inflate(R.layout.item_texto, parent, false);
         TextView lblTexto = itemView.findViewById(R.id.txtlbl);
-        lblTexto.setText(textos.get(position).getText());
-        String cor = textos.get(position).getColor();
+        lblTexto.setText(texts.get(position).getText());
+        String cor = texts.get(position).getColor();
         if (cor != null) {
             if (cor.equals("vermelho") ){
                 lblTexto.setTextColor(Color.RED);

@@ -12,7 +12,7 @@
         android:theme="@style/Theme.TextoCor"
         tools:targetApi="31">
         <activity
-            android:name=".TextoActivity"
+            android:name=".TextActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

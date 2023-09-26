@@ -1,20 +1,18 @@
 package com.example.textocor;
 
-import android.graphics.Color;
-
-public class Texto {
+public class Text {
 
     private int id;
     private String text;
     private String color;
 
-    public Texto(int id, String text, String color) {
+    public Text(int id, String text, String color) {
         this.id = id;
         this.text = text;
         this.color = color;
     }
 
-    public Texto(String text, String color) {
+    public Text(String text, String color) {
         this.text = text;
         this.color = color;
     }

@@ -14,14 +14,14 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-// Gustavo Trizotti e Arthur Mascaro
+// Miguel Santos e Giovanna Caroline
 
 public class MainActivity extends AppCompatActivity {
 
-    private ListView listaTextos;
-    private ArrayList<Texto> textos = new ArrayList<>();
+    private ListView textsList;
+    private ArrayList<Text> texts = new ArrayList<>();
     private Button btnAddText;
-    private TextoAdapter adaptador;
+    private TextAdapter adapter;
     private SQLiteDatabase db;
 
     @Override
@@ -29,22 +29,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        listaTextos = findViewById(R.id.listView);
+        textsList = findViewById(R.id.textsList);
         btnAddText = findViewById(R.id.btnAddText);
 
-        EscutadorLista el = new EscutadorLista();
-        listaTextos.setOnItemClickListener( el );
-        listaTextos.setOnItemLongClickListener( el );
+        ListListener ll = new ListListener();
+        textsList.setOnItemClickListener( ll );
+        textsList.setOnItemLongClickListener( ll );
 
         db = openOrCreateDatabase("db", MODE_PRIVATE, null);
         String cmd = "CREATE TABLE IF NOT EXISTS textTable (id INTEGER PRIMARY KEY AUTOINCREMENT, texto VARCHAR(50), color VARCHAR(50))";
         db.execSQL(cmd);
 
-        btnAddText.setOnClickListener(new EscutadorBotao());
+        btnAddText.setOnClickListener(new BtnListener());
 
-        adaptador = new TextoAdapter(this, textos);
+        adapter = new TextAdapter(this, texts);
 
-        listaTextos.setAdapter(adaptador);
+        textsList.setAdapter(adapter);
 
         cmd = "SELECT * FROM textTable";
         Cursor cursor = db.rawQuery(cmd, null);
@@ -53,18 +53,39 @@ public class MainActivity extends AppCompatActivity {
             int id = cursor.getInt(0);
             String texto = cursor.getString(1);
             String cor = cursor.getString(2);
-            Texto text = new Texto(id, texto, cor);
-            textos.add(text);
+            Text text = new Text(id, texto, cor);
+            texts.add(text);
             cursor.moveToNext();
         }
 
 
     }
 
-    private class EscutadorBotao implements View.OnClickListener {
+    private class ListListener implements AdapterView.OnItemClickListener,
+            AdapterView.OnItemLongClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            Text text = texts.get(i);
+            String msg = "Text: " + text.getText() + "\nCor: " + text.getColor();
+            Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+            Text text = texts.get(i);
+            texts.remove(i);
+            String cmd = "DELETE FROM textTable WHERE id = " + text.getId();
+            db.execSQL(cmd);
+            adapter.notifyDataSetChanged();
+            return true;
+        }
+    }
+
+    private class BtnListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            Intent i = new Intent(MainActivity.this, TextoActivity.class);
+            Intent i = new Intent(MainActivity.this, TextActivity.class);
             startActivityForResult(i, 1);
         }
     }
@@ -76,35 +97,16 @@ public class MainActivity extends AppCompatActivity {
         if ((requestCode == 1) && (resultCode == RESULT_OK)) {
             String texto = data.getStringExtra("texto");
             String cor = data.getStringExtra("cor");
-            Texto text = new Texto(texto, cor);
+            Text text = new Text(texto, cor);
 
             String cmd;
             cmd = "INSERT INTO textTable (texto, color) VALUES ('" + text.getText() + "', '" + text.getColor() + "')";
             db.execSQL(cmd);
 
-            textos.add(text);
-            adaptador.notifyDataSetChanged();
+            texts.add(text);
+            adapter.notifyDataSetChanged();
         }
     }
 
-    private class EscutadorLista implements AdapterView.OnItemClickListener,
-            AdapterView.OnItemLongClickListener {
 
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            Texto texto = textos.get(i);
-            String msg = "Texto: " + texto.getText() + "\nCor: " + texto.getColor();
-            Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-            Texto texto = textos.get(i);
-            textos.remove(i);
-            String cmd = "DELETE FROM textTable WHERE id = " + texto.getId();
-            db.execSQL(cmd);
-            adaptador.notifyDataSetChanged();
-            return true;
-        }
-    }
 }
